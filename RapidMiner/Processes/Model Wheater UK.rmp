@@ -12,21 +12,10 @@
     <parameter key="process_duration_for_mail" value="30"/>
     <parameter key="encoding" value="SYSTEM"/>
     <process expanded="true">
-      <operator activated="true" class="retrieve" compatibility="9.8.001" expanded="true" height="68" name="Retrieve Portugal_Theatrical_launch (2)" width="90" x="45" y="187">
-        <parameter key="repository_entry" value="../Data/Portugal_Theatrical_launch"/>
+      <operator activated="true" class="retrieve" compatibility="9.8.001" expanded="true" height="68" name="Retrieve movie_summary" width="90" x="45" y="340">
+        <parameter key="repository_entry" value="//Cenas/os-colegas-da-francisca_2/RapidMiner/Data/movie_summary"/>
       </operator>
-      <operator activated="true" class="generate_attributes" compatibility="9.8.001" expanded="true" height="82" name="Generate Attributes" width="90" x="179" y="187">
-        <list key="function_descriptions">
-          <parameter key="dif_temprature_high" value="[average(Normal High (F))]-[average(High (F))]"/>
-          <parameter key="dif_temprature_low" value="[average(Normal Low (F))]-[average(Low (F))]"/>
-          <parameter key="dif_percipitation" value="[average(Normal Precip (in.))]-[average(Precip (in.))]"/>
-        </list>
-        <parameter key="keep_all" value="true"/>
-      </operator>
-      <operator activated="true" class="retrieve" compatibility="9.8.001" expanded="true" height="68" name="Retrieve movie_summary (2)" width="90" x="45" y="340">
-        <parameter key="repository_entry" value="../Data/movie_summary"/>
-      </operator>
-      <operator activated="true" class="select_attributes" compatibility="9.8.001" expanded="true" height="82" name="Select Attributes (2)" width="90" x="179" y="340">
+      <operator activated="true" class="select_attributes" compatibility="9.8.001" expanded="true" height="82" name="Select Attributes (2)" width="90" x="246" y="340">
         <parameter key="attribute_filter_type" value="subset"/>
         <parameter key="attribute" value=""/>
         <parameter key="attributes" value="genre|movie_odid|source|creative_type|sequel"/>
@@ -39,6 +28,17 @@
         <parameter key="except_block_type" value="value_matrix_row_start"/>
         <parameter key="invert_selection" value="false"/>
         <parameter key="include_special_attributes" value="false"/>
+      </operator>
+      <operator activated="true" class="retrieve" compatibility="9.8.001" expanded="true" height="68" name="Retrieve UK_Theatrical_launch" width="90" x="45" y="187">
+        <parameter key="repository_entry" value="../Data/UK_Theatrical_launch"/>
+      </operator>
+      <operator activated="true" class="generate_attributes" compatibility="9.8.001" expanded="true" height="82" name="Generate Attributes" width="90" x="179" y="187">
+        <list key="function_descriptions">
+          <parameter key="dif_temprature_high" value="[average(Normal High (F))]-[average(High (F))]"/>
+          <parameter key="dif_temprature_low" value="[average(Normal Low (F))]-[average(Low (F))]"/>
+          <parameter key="dif_percipitation" value="[average(Normal Precip (in.))]-[average(Precip (in.))]"/>
+        </list>
+        <parameter key="keep_all" value="true"/>
       </operator>
       <operator activated="true" class="concurrency:join" compatibility="9.8.001" expanded="true" height="82" name="Join" width="90" x="313" y="187">
         <parameter key="remove_double_attributes" value="true"/>
@@ -83,7 +83,7 @@
         <parameter key="enable_parallel_execution" value="true"/>
         <process expanded="true">
           <operator activated="true" class="k_nn" compatibility="9.8.001" expanded="true" height="82" name="k-NN" width="90" x="112" y="136">
-            <parameter key="k" value="5"/>
+            <parameter key="k" value="21"/>
             <parameter key="weighted_vote" value="true"/>
             <parameter key="measure_types" value="MixedMeasures"/>
             <parameter key="mixed_measure" value="MixedEuclideanDistance"/>
@@ -184,16 +184,16 @@
           <portSpacing port="sink_performance 2" spacing="0"/>
         </process>
       </operator>
-      <connect from_op="Retrieve Portugal_Theatrical_launch (2)" from_port="output" to_op="Generate Attributes" to_port="example set input"/>
-      <connect from_op="Generate Attributes" from_port="example set output" to_op="Join" to_port="left"/>
-      <connect from_op="Retrieve movie_summary (2)" from_port="output" to_op="Select Attributes (2)" to_port="example set input"/>
+      <connect from_op="Retrieve movie_summary" from_port="output" to_op="Select Attributes (2)" to_port="example set input"/>
       <connect from_op="Select Attributes (2)" from_port="example set output" to_op="Join" to_port="right"/>
+      <connect from_op="Retrieve UK_Theatrical_launch" from_port="output" to_op="Generate Attributes" to_port="example set input"/>
+      <connect from_op="Generate Attributes" from_port="example set output" to_op="Join" to_port="left"/>
       <connect from_op="Join" from_port="join" to_op="Filter Examples" to_port="example set input"/>
       <connect from_op="Filter Examples" from_port="example set output" to_op="Select Attributes" to_port="example set input"/>
       <connect from_op="Select Attributes" from_port="example set output" to_op="Cross Validation" to_port="example set"/>
       <connect from_op="Cross Validation" from_port="model" to_port="result 1"/>
-      <connect from_op="Cross Validation" from_port="example set" to_port="result 3"/>
-      <connect from_op="Cross Validation" from_port="performance 1" to_port="result 2"/>
+      <connect from_op="Cross Validation" from_port="example set" to_port="result 2"/>
+      <connect from_op="Cross Validation" from_port="performance 1" to_port="result 3"/>
       <portSpacing port="source_input 1" spacing="0"/>
       <portSpacing port="sink_result 1" spacing="0"/>
       <portSpacing port="sink_result 2" spacing="0"/>

@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?><process version="9.8.001">
+  <context>
+    <input/>
+    <output/>
+    <macros/>
+  </context>
+  <operator activated="true" class="process" compatibility="9.8.001" expanded="true" name="Process">
+    <parameter key="logverbosity" value="init"/>
+    <parameter key="random_seed" value="2001"/>
+    <parameter key="send_mail" value="never"/>
+    <parameter key="notification_email" value=""/>
+    <parameter key="process_duration_for_mail" value="30"/>
+    <parameter key="encoding" value="SYSTEM"/>
+    <process expanded="true">
+      <operator activated="true" class="retrieve" compatibility="9.8.001" expanded="true" height="68" name="Retrieve movie_summary" width="90" x="45" y="340">
+        <parameter key="repository_entry" value="../data/movie_summary"/>
+      </operator>
+      <operator activated="true" class="select_attributes" compatibility="9.8.001" expanded="true" height="82" name="Select Attributes (2)" width="90" x="179" y="340">
+        <parameter key="attribute_filter_type" value="subset"/>
+        <parameter key="attribute" value=""/>
+        <parameter key="attributes" value="genre|movie_odid|source|creative_type|sequel"/>
+        <parameter key="use_except_expression" value="false"/>
+        <parameter key="value_type" value="attribute_value"/>
+        <parameter key="use_value_type_exception" value="false"/>
+        <parameter key="except_value_type" value="time"/>
+        <parameter key="block_type" value="attribute_block"/>
+        <parameter key="use_block_type_exception" value="false"/>
+        <parameter key="except_block_type" value="value_matrix_row_start"/>
+        <parameter key="invert_selection" value="false"/>
+        <parameter key="include_special_attributes" value="false"/>
+      </operator>
+      <operator activated="true" class="retrieve" compatibility="9.8.001" expanded="true" height="68" name="Retrieve Portugal_Theatrical_launch" width="90" x="45" y="187">
+        <parameter key="repository_entry" value="../data/Portugal_Theatrical_launch"/>
+      </operator>
+      <operator activated="true" class="generate_attributes" compatibility="9.8.001" expanded="true" height="82" name="Generate Attributes" width="90" x="179" y="187">
+        <list key="function_descriptions">
+          <parameter key="dif_temprature_high" value="[average(Normal High (F))]-[average(High (F))]"/>
+          <parameter key="dif_temprature_low" value="[average(Normal Low (F))]-[average(Low (F))]"/>
+          <parameter key="dif_percipitation" value="[average(Normal Precip (in.))]-[average(Precip (in.))]"/>
+        </list>
+        <parameter key="keep_all" value="true"/>
+      </operator>
+      <operator activated="true" class="concurrency:join" compatibility="9.8.001" expanded="true" height="82" name="Join" width="90" x="313" y="187">
+        <parameter key="remove_double_attributes" value="true"/>
+        <parameter key="join_type" value="inner"/>
+        <parameter key="use_id_attribute_as_key" value="false"/>
+        <list key="key_attributes">
+          <parameter key="movie_odid" value="movie_odid"/>
+        </list>
+        <parameter key="keep_both_join_attributes" value="false"/>
+      </operator>
+      <operator activated="true" class="filter_examples" compatibility="9.8.001" expanded="true" height="103" name="Filter Examples" width="90" x="447" y="187">
+        <parameter key="parameter_expression" value=""/>
+        <parameter key="condition_class" value="custom_filters"/>
+        <parameter key="invert_filter" value="true"/>
+        <list key="filters_list">
+          <parameter key="filters_entry_key" value="Opening Percentage.eq.100\.0"/>
+        </list>
+        <parameter key="filters_logic_and" value="true"/>
+        <parameter key="filters_check_metadata" value="true"/>
+      </operator>
+      <operator activated="true" class="select_attributes" compatibility="9.8.001" expanded="true" height="82" name="Select Attributes" width="90" x="581" y="187">
+        <parameter key="attribute_filter_type" value="subset"/>
+        <parameter key="attribute" value=""/>
+        <parameter key="attributes" value="average(High (F))|average(Low (F))|average(Precip (in.))|creative_type|dif_percipitation|dif_temprature_high|dif_temprature_low|genre|local_box_office|Opening Percentage|opening_weekend_theaters|sequel|source|total_box_office"/>
+        <parameter key="use_except_expression" value="false"/>
+        <parameter key="value_type" value="attribute_value"/>
+        <parameter key="use_value_type_exception" value="false"/>
+        <parameter key="except_value_type" value="time"/>
+        <parameter key="block_type" value="attribute_block"/>
+        <parameter key="use_block_type_exception" value="false"/>
+        <parameter key="except_block_type" value="value_matrix_row_start"/>
+        <parameter key="invert_selection" value="false"/>
+        <parameter key="include_special_attributes" value="false"/>
+      </operator>
+      <operator activated="true" class="concurrency:cross_validation" compatibility="9.8.001" expanded="true" height="145" name="Cross Validation" width="90" x="715" y="187">
+        <parameter key="split_on_batch_attribute" value="false"/>
+        <parameter key="leave_one_out" value="false"/>
+        <parameter key="number_of_folds" value="10"/>
+        <parameter key="sampling_type" value="automatic"/>
+        <parameter key="use_local_random_seed" value="false"/>
+        <parameter key="local_random_seed" value="4000"/>
+        <parameter key="enable_parallel_execution" value="true"/>
+        <process expanded="true">
+          <operator activated="true" class="k_nn" compatibility="9.8.001" expanded="true" height="82" name="k-NN" width="90" x="112" y="136">
+            <parameter key="k" value="5"/>
+            <parameter key="weighted_vote" value="true"/>
+            <parameter key="measure_types" value="MixedMeasures"/>
+            <parameter key="mixed_measure" value="MixedEuclideanDistance"/>
+            <parameter key="nominal_measure" value="NominalDistance"/>
+            <parameter key="numerical_measure" value="EuclideanDistance"/>
+            <parameter key="divergence" value="GeneralizedIDivergence"/>
+            <parameter key="kernel_type" value="radial"/>
+            <parameter key="kernel_gamma" value="1.0"/>
+            <parameter key="kernel_sigma1" value="1.0"/>
+            <parameter key="kernel_sigma2" value="0.0"/>
+            <parameter key="kernel_sigma3" value="2.0"/>
+            <parameter key="kernel_degree" value="3.0"/>
+            <parameter key="kernel_shift" value="1.0"/>
+            <parameter key="kernel_a" value="1.0"/>
+            <parameter key="kernel_b" value="0.0"/>
+          </operator>
+          <operator activated="false" class="default_model" compatibility="9.8.001" expanded="true" height="82" name="Default Model" width="90" x="112" y="34">
+            <parameter key="method" value="median"/>
+            <parameter key="constant" value="0.0"/>
+            <parameter key="attribute_name" value=""/>
+          </operator>
+          <operator activated="false" class="h2o:deep_learning" compatibility="9.8.001" expanded="true" height="103" name="Deep Learning" width="90" x="112" y="238">
+            <parameter key="activation" value="Rectifier"/>
+            <enumeration key="hidden_layer_sizes">
+              <parameter key="hidden_layer_sizes" value="50"/>
+              <parameter key="hidden_layer_sizes" value="50"/>
+            </enumeration>
+            <enumeration key="hidden_dropout_ratios"/>
+            <parameter key="reproducible_(uses_1_thread)" value="false"/>
+            <parameter key="use_local_random_seed" value="false"/>
+            <parameter key="local_random_seed" value="1992"/>
+            <parameter key="epochs" value="10.0"/>
+            <parameter key="compute_variable_importances" value="false"/>
+            <parameter key="train_samples_per_iteration" value="-2"/>
+            <parameter key="adaptive_rate" value="true"/>
+            <parameter key="epsilon" value="0.001"/>
+            <parameter key="rho" value="0.99"/>
+            <parameter key="learning_rate" value="0.005"/>
+            <parameter key="learning_rate_annealing" value="1.0E-6"/>
+            <parameter key="learning_rate_decay" value="1.0"/>
+            <parameter key="momentum_start" value="0.0"/>
+            <parameter key="momentum_ramp" value="1000000.0"/>
+            <parameter key="momentum_stable" value="0.0"/>
+            <parameter key="nesterov_accelerated_gradient" value="true"/>
+            <parameter key="standardize" value="true"/>
+            <parameter key="L1" value="1.0E-5"/>
+            <parameter key="L2" value="0.0"/>
+            <parameter key="max_w2" value="10.0"/>
+            <parameter key="loss_function" value="Automatic"/>
+            <parameter key="distribution_function" value="AUTO"/>
+            <parameter key="early_stopping" value="false"/>
+            <parameter key="stopping_rounds" value="1"/>
+            <parameter key="stopping_metric" value="AUTO"/>
+            <parameter key="stopping_tolerance" value="0.001"/>
+            <parameter key="missing_values_handling" value="MeanImputation"/>
+            <parameter key="max_runtime_seconds" value="0"/>
+            <list key="expert_parameters"/>
+            <list key="expert_parameters_"/>
+          </operator>
+          <connect from_port="training set" to_op="k-NN" to_port="training set"/>
+          <connect from_op="k-NN" from_port="model" to_port="model"/>
+          <portSpacing port="source_training set" spacing="0"/>
+          <portSpacing port="sink_model" spacing="0"/>
+          <portSpacing port="sink_through 1" spacing="0"/>
+        </process>
+        <process expanded="true">
+          <operator activated="true" class="apply_model" compatibility="9.8.001" expanded="true" height="82" name="Apply Model" width="90" x="45" y="34">
+            <list key="application_parameters"/>
+            <parameter key="create_view" value="false"/>
+          </operator>
+          <operator activated="true" class="performance_regression" compatibility="9.8.001" expanded="true" height="82" name="Performance" width="90" x="313" y="34">
+            <parameter key="main_criterion" value="first"/>
+            <parameter key="root_mean_squared_error" value="true"/>
+            <parameter key="absolute_error" value="false"/>
+            <parameter key="relative_error" value="false"/>
+            <parameter key="relative_error_lenient" value="false"/>
+            <parameter key="relative_error_strict" value="false"/>
+            <parameter key="normalized_absolute_error" value="false"/>
+            <parameter key="root_relative_squared_error" value="false"/>
+            <parameter key="squared_error" value="false"/>
+            <parameter key="correlation" value="true"/>
+            <parameter key="squared_correlation" value="true"/>
+            <parameter key="prediction_average" value="false"/>
+            <parameter key="spearman_rho" value="false"/>
+            <parameter key="kendall_tau" value="false"/>
+            <parameter key="skip_undefined_labels" value="true"/>
+            <parameter key="use_example_weights" value="true"/>
+          </operator>
+          <connect from_port="model" to_op="Apply Model" to_port="model"/>
+          <connect from_port="test set" to_op="Apply Model" to_port="unlabelled data"/>
+          <connect from_op="Apply Model" from_port="labelled data" to_op="Performance" to_port="labelled data"/>
+          <connect from_op="Performance" from_port="performance" to_port="performance 1"/>
+          <portSpacing port="source_model" spacing="0"/>
+          <portSpacing port="source_test set" spacing="0"/>
+          <portSpacing port="source_through 1" spacing="0"/>
+          <portSpacing port="sink_test set results" spacing="0"/>
+          <portSpacing port="sink_performance 1" spacing="0"/>
+          <portSpacing port="sink_performance 2" spacing="0"/>
+        </process>
+      </operator>
+      <connect from_op="Retrieve movie_summary" from_port="output" to_op="Select Attributes (2)" to_port="example set input"/>
+      <connect from_op="Select Attributes (2)" from_port="example set output" to_op="Join" to_port="right"/>
+      <connect from_op="Retrieve Portugal_Theatrical_launch" from_port="output" to_op="Generate Attributes" to_port="example set input"/>
+      <connect from_op="Generate Attributes" from_port="example set output" to_op="Join" to_port="left"/>
+      <connect from_op="Join" from_port="join" to_op="Filter Examples" to_port="example set input"/>
+      <connect from_op="Filter Examples" from_port="example set output" to_op="Select Attributes" to_port="example set input"/>
+      <connect from_op="Select Attributes" from_port="example set output" to_op="Cross Validation" to_port="example set"/>
+      <connect from_op="Cross Validation" from_port="model" to_port="result 1"/>
+      <connect from_op="Cross Validation" from_port="example set" to_port="result 3"/>
+      <connect from_op="Cross Validation" from_port="performance 1" to_port="result 2"/>
+      <portSpacing port="source_input 1" spacing="0"/>
+      <portSpacing port="sink_result 1" spacing="0"/>
+      <portSpacing port="sink_result 2" spacing="0"/>
+      <portSpacing port="sink_result 3" spacing="0"/>
+      <portSpacing port="sink_result 4" spacing="0"/>
+    </process>
+  </operator>
+</process>
